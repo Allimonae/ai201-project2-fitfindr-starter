@@ -103,6 +103,26 @@ Your README submission must document each tool's name, inputs, and return value.
 
 **Final output to user:**
 
+User input: something pink under 50
+
+Top listing: 
+
+Y2K Baby Tee — Butterfly Print
+
+Price:     $18.0
+Size:      S/M
+Condition: excellent
+Category:  tops
+Colors:    white, pink, purple
+Style:     y2k, vintage, graphic tee, cottagecore
+Platform:  depop
+
+Super cute early 2000s baby tee with butterfly graphic. Fitted crop length. Tag says medium but fits like a small.
+
+Outfit idea: To style the Y2K Baby Tee, pair it with the baggy straight-leg jeans for a relaxed look. Tuck the tee into the jeans to accentuate the butterfly print, and add the chunky white sneakers for a casual vibe. For a cooler day, layer the vintage black denim jacket over the tee and swap the sneakers for black combat boots. This outfit combines the soft, feminine touch of the butterfly print with edgy, casual pieces. Roll up the jacket's sleeves to add a laid-back touch to the overall look.
+
+Fit card: Just thrifted this adorable Y2K Baby Tee — Butterfly Print on Depop for $18.0 and I'm obsessed with how it adds a soft, feminine touch to my outfit. I paired it with my fave baggy straight-leg jeans and chunky white sneakers for a laid-back, casual vibe that's perfect for a sunny day. When it gets cooler, I'll throw on my vintage black denim jacket and swap the sneakers for black combat boots to give the look a bit of an edge. The combination of the delicate butterfly print with these edgy pieces is literally my dream aesthetic.
+
 ---
 
 ## Error Handling and Fail Points
@@ -118,6 +138,25 @@ Your README submission must document each tool's name, inputs, and return value.
 
 ---
 
+## Planning Loop
+
+**How does your agent decide which tool to call next?**
+Call search_listings using the user's description, size, and max price.
+If no listings are returned, stop and show an error message with suggestions for refining the search.
+If listings are found, select the top result and call suggest_outfit with the selected item and the user's wardrobe.
+If no outfit can be generated, stop and inform the user that there are no suitable wardrobe items to pair with the listing.
+If an outfit is generated, call create_fit_card using the outfit and selected item.
+Return the fit card caption and end the workflow.
+
+The agent knows it is done after create_fit_card successfully returns a caption or after any tool returns a stopping condition.
+
+---
+
+## State Management
+
+**How does information from one tool get passed to the next?**
+The agent stores intermediate results in session state. After search_listings runs, the top result is saved as selected_item. selected_item is then passed to suggest_outfit as new_item along with the user's wardrobe. The generated outfit is saved as outfit and passed to create_fit_card together with selected_item. The agent also tracks any error messages so it can stop the workflow early if a tool returns no results.
+
 ## Spec Reflection
 
 <!-- Answer both questions with at least 2–3 sentences each. -->
@@ -127,6 +166,8 @@ Writing out the specifications helped me understand what is going on and the pur
 
 **One divergence from your spec, and why:**
 I wanted FitFindr to be more specific and unique with styling suggestions and creating fit cards. Before making this change I found the output kind of generic, since I was limiting to 1-2 sentences.
+
+In addition, I had to add guardrails to make sure it did not return any listings with irrelevant user input such as "hi there"
 
 ---
 

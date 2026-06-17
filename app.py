@@ -54,10 +54,11 @@ def handle_query(user_query: str, wardrobe_choice: str) -> tuple[str, str, str]:
 
     session = run_agent(user_query, wardrobe)
 
-    if session["error"]:
+    item = session["selected_item"]
+    if item is None:
+        # No results found — nothing to show
         return session["error"], "", ""
 
-    item = session["selected_item"]
     listing_text = (
         f"{item['title']}\n\n"
         f"Price:     ${item['price']}\n"
@@ -70,6 +71,9 @@ def handle_query(user_query: str, wardrobe_choice: str) -> tuple[str, str, str]:
         + (f"Brand:     {item['brand']}\n" if item.get('brand') else "")
         + f"\n{item['description']}"
     )
+
+    if session["error"]:
+        return listing_text, session["error"], ""
 
     return listing_text, session["outfit_suggestion"], session["fit_card"]
 

@@ -80,8 +80,18 @@ def search_listings(
             continue
         filtered.append(listing)
 
+    # Strip common words that appear in listing text but carry no fashion meaning
+    _STOP_WORDS = {
+        "a", "an", "the", "and", "or", "but", "in", "on", "at", "to", "for",
+        "of", "with", "is", "it", "i", "my", "me", "hi", "hello", "hey",
+        "there", "looking", "want", "need", "find", "get", "some", "something",
+        "please", "thanks", "thank", "can", "you", "do", "have", "like",
+        "would", "size", "under", "around", "about", "price",
+    }
+
     # Score by keyword overlap with description
-    keywords = set(description.lower().split())
+    raw_keywords = set(description.lower().split())
+    keywords = raw_keywords - _STOP_WORDS
     scored = []
     for listing in filtered:
         searchable = " ".join([
@@ -127,31 +137,26 @@ def suggest_outfit(new_item: dict, wardrobe: dict) -> str:
 
     Before writing code, fill in the Tool 2 section of planning.md.
     """
+    if not wardrobe.get("items"):
+        return ""
+
     client = _get_groq_client()
     item_summary = (
         f"{new_item['title']} — {new_item['category']}, {', '.join(new_item['colors'])}, "
         f"size {new_item['size']}, style: {', '.join(new_item['style_tags'])}"
     )
 
-    if not wardrobe.get("items"):
-        prompt = (
-            f"A user is considering buying this thrifted item: {item_summary}.\n"
-            "Their wardrobe is empty, so suggest general styling ideas: what kinds of "
-            "pieces pair well with it, what vibe or occasion it suits, and any styling tips. "
-            "Keep it to 2–3 sentences, casual and specific."
-        )
-    else:
-        wardrobe_lines = "\n".join(
-            f"- {item['name']} ({item.get('category', '')}): {item.get('color', '')} {item.get('style', '')}"
-            for item in wardrobe["items"]
-        )
-        prompt = (
-            f"A user is considering buying this thrifted item: {item_summary}.\n"
-            f"Their wardrobe contains:\n{wardrobe_lines}\n\n"
-            "Suggest 1–2 complete outfits using the new item and specific named pieces "
-            "from the wardrobe above. Be casual and specific — mention item names, colors, "
-            "and any small styling tips (tuck, roll, layer, etc.). Keep it to 3–5 sentences."
-        )
+    wardrobe_lines = "\n".join(
+        f"- {item['name']} ({item.get('category', '')}): {item.get('color', '')} {item.get('style', '')}"
+        for item in wardrobe["items"]
+    )
+    prompt = (
+        f"A user is considering buying this thrifted item: {item_summary}.\n"
+        f"Their wardrobe contains:\n{wardrobe_lines}\n\n"
+        "Suggest 1–2 complete outfits using the new item and specific named pieces "
+        "from the wardrobe above. Be casual and specific — mention item names, colors, "
+        "and any small styling tips (tuck, roll, layer, etc.). Keep it to 3–5 sentences."
+    )
 
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",

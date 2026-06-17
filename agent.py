@@ -134,6 +134,12 @@ def run_agent(query: str, wardrobe: dict) -> dict:
     # Step 5: Suggest outfit
     session["outfit_suggestion"] = suggest_outfit(results[0], wardrobe)
 
+    if not session["outfit_suggestion"]:
+        session["error"] = (
+            "Your wardrobe is empty — add some items to get outfit suggestions."
+        )
+        return session
+
     # Step 6: Create fit card
     session["fit_card"] = create_fit_card(session["outfit_suggestion"], results[0])
 

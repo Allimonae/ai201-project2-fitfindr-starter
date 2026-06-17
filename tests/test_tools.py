@@ -98,13 +98,10 @@ def test_suggest_outfit_with_wardrobe(mock_get_client):
     assert len(result) > 0
 
 
-@patch("tools._get_groq_client")
-def test_suggest_outfit_empty_wardrobe(mock_get_client):
-    # Should not crash — returns general styling advice instead
-    mock_get_client.return_value = _mock_groq("Try pairing with wide-leg trousers for a relaxed look.")
+def test_suggest_outfit_empty_wardrobe_returns_empty_string():
+    # Empty wardrobe → empty string (signals failure to caller), no LLM call
     result = suggest_outfit(SAMPLE_ITEM, EMPTY_WARDROBE)
-    assert isinstance(result, str)
-    assert len(result) > 0
+    assert result == ""
 
 
 @patch("tools._get_groq_client")
@@ -116,16 +113,12 @@ def test_suggest_outfit_calls_llm(mock_get_client):
 
 
 @patch("tools._get_groq_client")
-def test_suggest_outfit_empty_wardrobe_uses_different_prompt(mock_get_client):
-    mock_client = _mock_groq("General styling advice here.")
+def test_suggest_outfit_empty_wardrobe_does_not_call_llm(mock_get_client):
+    # LLM should never be reached when wardrobe is empty
+    mock_client = _mock_groq("Should not be called.")
     mock_get_client.return_value = mock_client
-
     suggest_outfit(SAMPLE_ITEM, EMPTY_WARDROBE)
-
-    call_args = mock_client.chat.completions.create.call_args
-    prompt = call_args.kwargs["messages"][0]["content"]
-    # Empty-wardrobe branch should mention the wardrobe is empty / give general advice
-    assert "empty" in prompt.lower() or "general" in prompt.lower()
+    mock_client.chat.completions.create.assert_not_called()
 
 
 # ── Tool 3: create_fit_card ────────────────────────────────────────────────────
