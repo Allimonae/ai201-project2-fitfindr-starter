@@ -16,7 +16,7 @@ You must have at least 3 tools. The three required tools are listed — add any 
 
 **What it does:**
 <!-- Describe what this tool does in 1–2 sentences -->
-A user inputs a description of what they are looking for, which is usually clothing or an outfit. They may include the style, price range, and size of the clothes they are looking for. Then the tool goes through listings.json and returns 2 mathching listings sorted by relevance. FitFindr picks the top result
+A user inputs a description of what they are looking for, which is usually clothing or an outfit. They may include the style, price range, and size of the clothes they are looking for. Then the tool goes through listings.json and returns 3 matching listings sorted by relevance. FitFindr picks the top result
 
 **Input parameters:**
 <!-- List each parameter, its type, and what it represents -->

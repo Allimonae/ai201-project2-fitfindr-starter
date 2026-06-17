@@ -77,22 +77,29 @@ Your README submission must document each tool's name, inputs, and return value.
 **User query:**
 
 **Step 1 — Tool called:**
-- Tool:
-- Input:
-- Why this tool:
-- Output:
+- Tool: search_listings
+- Input: 
+     - `description` (str): may describe the style, vibe, and item of clothing the user is trying to find
+     - `size` (str): specifies the size that user would like the clothing to be. could be multiple dimensions. try to get exact sizes
+     - `max_price` (float): how much user is willing to pay. try not to choose clothing that is above this price
+- Why this tool: This picks out a new item based on what the user is looking for
+- Output: Then the tool goes through listings.json and returns 3 matching listings sorted by relevance. FitFindr picks the top result
 
 **Step 2 — Tool called:**
-- Tool:
-- Input:
-- Why this tool:
-- Output:
+- Tool: suggest_outfit
+- Input: 
+     - `new_item` (dict): the listing in listings.json chosen from search_listings.
+     - `wardrobe` (dict): a list of clothing from user's wardrobe. use items from here to pair with new_item
+- Why this tool: Users want to know if an item would go well with their existing wardrobe so the output helps them with styling
+- Output: Describes an outfit and styling that would go with the listing outputed from search_listings
 
 **Step 3 — Tool called:**
-- Tool:
+- Tool: create_fit_card
 - Input:
-- Why this tool:
-- Output:
+     - `outfit` (str): generated from suggest_outfit
+     - `new_item` (dict): the listing in listings.json chosen from search_listings.
+- Why this tool: Users want to show off their outfit on socials with a unique caption
+- Output: A caption featuring the new item and outfit. make it unique to item and outfit
 
 **Final output to user:**
 
@@ -105,9 +112,9 @@ Your README submission must document each tool's name, inputs, and return value.
 
 | Tool | Failure mode | Agent response |
 |------|-------------|----------------|
-| `search_listings` | | |
-| `suggest_outfit` | | |
-| `create_fit_card` | | |
+| `search_listings` | No results match the query | Inform the user that no matching listings were found and suggest adjusting the description, size, or price range. Stop the workflow and do not call suggest_outfit.|
+| `suggest_outfit` | Wardrobe is empty |Inform the user that there are no wardrobe items available to create an outfit. Stop the workflow and do not call create_fit_card. |
+| `create_fit_card` | Outfit input is missing or incomplete |Return an error message such as "No outfit generated, cannot create fit card." Stop the workflow and do not generate a caption. |
 
 ---
 
@@ -116,8 +123,10 @@ Your README submission must document each tool's name, inputs, and return value.
 <!-- Answer both questions with at least 2–3 sentences each. -->
 
 **One way planning.md helped during implementation:**
+Writing out the specifications helped me understand what is going on and the purpose of each tool and the flow. However I don't understand why I am filling it in when the function comments kind of have the same thing. It was easy to copy and paste the context to AI.
 
 **One divergence from your spec, and why:**
+I wanted FitFindr to be more specific and unique with styling suggestions and creating fit cards. Before making this change I found the output kind of generic, since I was limiting to 1-2 sentences.
 
 ---
 
